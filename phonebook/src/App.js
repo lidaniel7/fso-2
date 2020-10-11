@@ -1,16 +1,27 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Form from './Components/Form.js'
 import Display from './Components/Display.js'
+import axios from 'axios'
+import personService from './services/personService.js'
 
 const App = () => {
-  const [ persons, setPersons ] = useState([
-    { 
+
+  useEffect(() => {
+    personService
+      .getPersons()
+      .then(people => {
+        setPersons(people)
+      })
+  }, [])
+
+  const [persons, setPersons] = useState([
+    {
       name: 'Arto Hellas',
       number: '040-1234567'
     }
-  ]) 
-  const [ newName, setNewName ] = useState('')
-  const [ newNumber, setNumber ] = useState('')
+  ])
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNumber] = useState('')
 
   const handleCurrInput = (event) => {
     setNewName(event.target.value)
@@ -18,6 +29,11 @@ const App = () => {
 
   const handlePhoneInput = (event) => {
     setNumber(event.target.value)
+  }
+
+  const handleDeletePerson = (id) => {
+    personService.deletePerson(id)
+      .then(response => setPersons(persons.filter(person => person.id !== id)))
   }
 
   const addPerson = (event) => {
@@ -31,15 +47,21 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    setPersons(persons.concat(newPerson))
+
+    personService.addPerson(newPerson)
+      .then(response => {
+        setPersons(persons.concat(response))
+        setNewName('')
+        setNumber('')
+      })
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Form addPerson={addPerson} handlePhoneInput={handlePhoneInput} handleCurrInput={handleCurrInput}/>
+      <Form addPerson={addPerson} handlePhoneInput={handlePhoneInput} handleCurrInput={handleCurrInput} />
       <h2>Numbers</h2>
-      <Display persons={persons}/>
+      <Display persons={persons} handleDeletePerson={handleDeletePerson} />
     </div>
   )
 }
