@@ -4,6 +4,8 @@ import Display from './Components/Display.js'
 import Notification from './Components/Notification.js'
 import axios from 'axios'
 import personService from './services/personService.js'
+import uniqid from "uniqid";
+
 
 const App = () => {
 
@@ -11,6 +13,7 @@ const App = () => {
     personService
       .getPersons()
       .then(people => {
+        console.log(people)
         setPersons(people)
       })
   }, [])
